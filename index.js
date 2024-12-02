@@ -32,10 +32,8 @@ app.get('/logout',(req, res) => {
 
 //for register
 app.post('/register', async (req, res) => {
-    // console.log(req.body);
     const { username, name, age, email, password } = req.body;
     const user = await userModel.findOne({ email })
-    // console.log(user);
 
     if (user) {
         return res.status(300).status({
@@ -45,7 +43,6 @@ app.post('/register', async (req, res) => {
     console.log(password);
 
     bcrypt.genSalt(10, function (err, salt) {
-        // console.log(salt);
         bcrypt.hash(password, salt, async function (err, hash) {
             // Store hash in your password DB.
             const user = await userModel.create({
@@ -67,11 +64,11 @@ app.post('/register', async (req, res) => {
 })
 
 // for login 
-app.post('/login', async (req, res) => {
+app.post('/login', isLoggedIn, async (req, res) => {
+    console.log(req.user,'from log in');
 
     const {email, password } = req.body;
     const user = await userModel.findOne({ email })
-    console.log(user);
 
     if (!user) {
         res.status(500).send('Email or Password is incorrect')
@@ -92,10 +89,18 @@ app.post('/login', async (req, res) => {
     
 })
 
+//make middleware for protected route
+function isLoggedIn(req, res, next) {
+    const token = req.cookies.token;
+    if (token === '') res.send('You must be logged in')
+    else {
+        const data = jwt.verify(token, 'hello1234')
+        req.user = data.user
+        next()
+    }
+    
+}
 
-app.post('/create', (req, res) => {
-    res.send('Hello World')
-})
 
 
 app.listen(3000, () => {
