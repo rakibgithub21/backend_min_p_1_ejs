@@ -34,13 +34,13 @@
     <div class="mt-5">
         <h3 class="text-medium text-xl">Your Post</h3>
         <div class="mt-2 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            <% user.post.forEach(function(x){ %>
+            <% user.post.reverse().forEach(function(x){ %>
                 <div class="card bg-base-100  border shadow-xl">
 
                     <div class="card-body">
                         <h2 class="card-title text-blue-700">@<%= user.username%>
                         </h2>
-                        <p>If a dog chews shoes whose shoes does he choose?</p>
+                        <p> <%= x.content%></p>
                         <div class="card-actions justify-end">
                             <a href="" class="badge badge-outline">Like</a>
                             <a href="" class="badge badge-outline">Edit</a>
