@@ -23,6 +23,12 @@ app.get('/login', (req, res) => {
     res.render('login')
 })
 
+//for logout
+app.get('/logout',(req, res) => {
+    res.cookie('token', '')
+    res.redirect('/login')
+})
+
 
 //for register
 app.post('/register', async (req, res) => {
@@ -71,8 +77,16 @@ app.post('/login', async (req, res) => {
         res.status(500).send('Email or Password is incorrect')
     } 
    
-    bcrypt.compare(password, user.password, function (err, result) {
-        if (result) res.status(200).send('You can log in')
+    bcrypt.compare(password, user.password, async function (err, result) {
+        if (result) {
+            const token = await jwt.sign({ user }, 'hello1234')
+            console.log(token);
+            res.cookie('token', token)
+            res.send('You can login')
+
+            
+        }
+
         else res.redirect('/login')
     });
     
