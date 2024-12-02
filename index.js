@@ -24,11 +24,17 @@ app.get('/login', (req, res) => {
 })
 
 //for logout
-app.get('/logout',(req, res) => {
+app.get('/logout', (req, res) => {
     res.cookie('token', '')
     res.redirect('/login')
 })
-
+//for profile page
+app.get('/profile', isLoggedIn, async (req, res) => {
+    const user = await userModel.findOne({ email: req.user.email })
+    console.log(user);
+    user.populate('post')
+    res.render('profile', { user })
+})
 
 //for register
 app.post('/register', async (req, res) => {
@@ -40,7 +46,6 @@ app.post('/register', async (req, res) => {
             message: 'User Already Registered'
         })
     }
-    console.log(password);
 
     bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, async function (err, hash) {
@@ -54,51 +59,77 @@ app.post('/register', async (req, res) => {
             })
 
             const token = await jwt.sign({ user }, 'hello1234')
-            console.log(token);
-            res.cookie('token',token)
+            res.cookie('token', token)
 
-            res.send(user)
+            res.redirect('/profile')
         });
     });
 
 })
 
 // for login 
-app.post('/login', isLoggedIn, async (req, res) => {
-    console.log(req.user,'from log in');
+app.post('/login', async (req, res) => {
 
-    const {email, password } = req.body;
+    const { email, password } = req.body;
     const user = await userModel.findOne({ email })
 
     if (!user) {
         res.status(500).send('Email or Password is incorrect')
-    } 
-   
+    }
+
     bcrypt.compare(password, user.password, async function (err, result) {
         if (result) {
             const token = await jwt.sign({ user }, 'hello1234')
-            console.log(token);
             res.cookie('token', token)
-            res.send('You can login')
+            res.redirect('/profile')
 
-            
+
         }
 
         else res.redirect('/login')
     });
-    
+
 })
+
+
+//for post 
+
+app.post('/post', isLoggedIn, async (req, res) => {
+    const user = await userModel.findOne({ email: req.user.email })
+
+    const { content } = req.body;
+
+    let post = await postModel.create({
+        user: user._id,
+        content
+    })
+
+    user.post.push(post._id)
+    await user.save()
+
+    res.redirect('/profile')
+
+})
+
+
+
+
+
+
+
+
+
 
 //make middleware for protected route
 function isLoggedIn(req, res, next) {
     const token = req.cookies.token;
-    if (token === '') res.send('You must be logged in')
+    if (token === '') res.redirect('/login')
     else {
         const data = jwt.verify(token, 'hello1234')
         req.user = data.user
         next()
     }
-    
+
 }
 
 
