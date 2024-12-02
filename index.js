@@ -62,38 +62,20 @@ app.post('/register', async (req, res) => {
 
 // for login 
 app.post('/login', async (req, res) => {
-    // console.log(req.body);
-    const { username, name, age, email, password } = req.body;
+
+    const {email, password } = req.body;
     const user = await userModel.findOne({ email })
-    // console.log(user);
+    console.log(user);
 
-    if (user) {
-        return res.status(300).status({
-            message: 'User Already Registered'
-        })
-    }
-    console.log(password);
-
-    bcrypt.genSalt(10, function (err, salt) {
-        // console.log(salt);
-        bcrypt.hash(password, salt, async function (err, hash) {
-            // Store hash in your password DB.
-            const user = await userModel.create({
-                username,
-                name,
-                age,
-                email,
-                password: hash
-            })
-
-            const token = await jwt.sign({ user }, 'hello1234')
-            console.log(token);
-            res.cookie('token', token)
-
-            res.send(user)
-        });
+    if (!user) {
+        res.status(500).send('Email or Password is incorrect')
+    } 
+   
+    bcrypt.compare(password, user.password, function (err, result) {
+        if (result) res.status(200).send('You can log in')
+        else res.redirect('/login')
     });
-
+    
 })
 
 
