@@ -40,9 +40,12 @@
                     <div class="card-body">
                         <h2 class="card-title text-blue-700">@<%= user.username%>
                         </h2>
-                        <p> <%= x.content%></p>
+                        <p><%= x.content%></p>
                         <div class="card-actions justify-end">
-                            <a href="" class="badge badge-outline">Like</a>
+                            <small><%= x.likes.length%> likes</small>
+                            <a href="/like/<%= x._id%>" class="badge badge-outline">
+                                <%=x.likes.indexOf(user._id) === - 1 ? "Unlike" : "Like" %>
+                            </a>
                             <a href="" class="badge badge-outline">Edit</a>
                         </div>
                     </div>

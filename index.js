@@ -31,9 +31,23 @@ app.get('/logout', (req, res) => {
 //for profile page
 app.get('/profile', isLoggedIn, async (req, res) => {
     const user = await userModel.findOne({ email: req.user.email }).populate('post')
-    console.log(user);
-    
+    // console.log(user);
+
     res.render('profile', { user })
+})
+
+//for like features
+app.get('/like/:id', isLoggedIn, async (req, res) => {
+
+    let post = await postModel.findOne({ _id: req.params.id })
+    if (post.likes.indexOf(req.user._id) === -1) {
+        post.likes.push(req.user._id)
+    } else {
+       post.likes.splice(post.likes.indexOf(req.user._id), 1)
+    }
+    post.save()
+    res.redirect('/profile')
+
 })
 
 //for register
