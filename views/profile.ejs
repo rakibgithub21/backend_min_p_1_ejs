@@ -44,9 +44,9 @@
                         <div class="card-actions justify-end">
                             <small><%= x.likes.length%> likes</small>
                             <a href="/like/<%= x._id%>" class="badge badge-outline">
-                                <%=x.likes.indexOf(user._id) === - 1 ? "Unlike" : "Like" %>
+                                <%=x.likes.indexOf(user._id) === - 1 ? "Like" : "Unlike" %>
                             </a>
-                            <a href="" class="badge badge-outline">Edit</a>
+                            <a href="/edit/<%= x._id%>" class="badge badge-outline">Edit</a>
                         </div>
                     </div>
                 </div>

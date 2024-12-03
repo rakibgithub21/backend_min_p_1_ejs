@@ -49,6 +49,23 @@ app.get('/like/:id', isLoggedIn, async (req, res) => {
     res.redirect('/profile')
 
 })
+//for edit features
+app.get('/edit/:id', isLoggedIn, async (req, res) => {
+    let post = await postModel.findOne({ _id: req.params.id })
+    console.log(post);
+    res.render('edit',{post})
+
+})
+
+//for update
+app.post('/update/:id', isLoggedIn, async (req, res) => {
+    let post = await postModel.findOneAndUpdate({ _id: req.params.id }, { content: req.body.content })
+    res.redirect('/profile')
+
+   
+
+})
+
 
 //for register
 app.post('/register', async (req, res) => {
